@@ -84,7 +84,7 @@ class EditTable(Resource):
         EventCalendar=args["EventCalendar"]
         Status=args["Status"]
         todo=Todo(Description=Description,Date=Date,StartTime=StartTime,EndTime=EndTime,EventCalendar=EventCalendar,Status=Status)
-        db.session.add(todo)
+       
         db.session.commit()
         return{"Message":"Updated Successfully"}
 
