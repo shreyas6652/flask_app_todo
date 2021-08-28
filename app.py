@@ -13,19 +13,28 @@ db = SQLAlchemy(app)
 class Todo(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
     Description = db.Column(db.String(200), nullable=True)
-    Time = db.Column(db.String(500), nullable=True)
+    Date=db.Column(db.String(500), nullable=True)
+    StartTime = db.Column(db.String(500), nullable=True)
+    EndTime=db.Column(db.String(500), nullable=True)
+    EventCalendar=db.Column(db.String(500), nullable=True)
     Status = db.Column(db.String(500), nullable=True)
 
 resource_fields={
     'sno':fields.Integer,
     'Description':fields.String,
-    'Time':fields.String,
+    'Date':fields.String,
+    'StartTime':fields.String,
+    'EndTime':fields.String,
+    'EventCalendar':fields.String,
     'Status':fields.String
 }
 
 info_put_args = reqparse.RequestParser()
 info_put_args.add_argument("Description", type=str, required=True)
-info_put_args.add_argument("Time", type=str, required=True)
+info_put_args.add_argument("Date", type=str, required=True)
+info_put_args.add_argument("StartTime", type=str, required=True)
+info_put_args.add_argument("EndTime", type=str, required=True)
+info_put_args.add_argument("EventCalendar", type=str, required=True)
 info_put_args.add_argument("Status", type=str,  required=True)
 
 class GetTable(Resource):
@@ -37,7 +46,10 @@ class GetTable(Resource):
             jsonitr={
                 "sno":itr.sno,
                 "Description":itr.Description,
-                "Time":itr.Time,
+                "Date":itr.Date,
+                "StartTime":itr.StartTime,
+                "EndTime":itr.EndTime,
+                "EventCalendar":itr.EventCalendar,
                 "Status":itr.Status
             }
             jsonobj.append(jsonitr)
@@ -45,30 +57,34 @@ class GetTable(Resource):
     def post(self):
         args = info_put_args.parse_args()
         Description=args["Description"]
-        Time=args["Time"]
+        Date=args["Date"]
+        StartTime=args["StartTime"]
+        EndTime=args["EndTime"]
+        EventCalendar=args["EventCalendar"]
         Status=args["Status"]
-        todo=Todo(Description=Description,Time=Time,Status=Status)
+        todo=Todo(Description=Description,Date=Date,StartTime=StartTime,EndTime=EndTime,EventCalendar=EventCalendar,Status=Status)
         db.session.add(todo)
         db.session.commit()
-        return {"Description" :Description,"Time":Time,"Status":Status}
+        return {"Description" :Description,"Date":Date,"StartTime":StartTime,"EndTime":EndTime,"EventCalendar":EventCalendar,"Status":Status}
 
 class EditTable(Resource):
     def get(self,sno):
         todo = Todo.query.filter_by(sno=sno).first()
-        
-        return {"Description":todo.Description,"Time":todo.Time,"Status":todo.Status}
+        return {"Description" :todo.Description,"Date":todo.Date,"StartTime":todo.StartTime,"EndTime":todo.EndTime,"EventCalendar":todo.EventCalendar,"Status":todo.Status}
+
     def put(self,sno):
         todo = Todo.query.filter_by(sno=sno).first()
         if not todo:
             return{"MessTime":"Data Doesnt exist"}
         args = info_put_args.parse_args()
-        Description=args['Description']
-        Time=args['Time']
-        Status=args['Status']
-       
-        todo.Description=Description
-        todo.Time=Time
-        todo.Status=Status
+        Description=args["Description"]
+        Date=args["Date"]
+        StartTime=args["StartTime"]
+        EndTime=args["EndTime"]
+        EventCalendar=args["EventCalendar"]
+        Status=args["Status"]
+        todo=Todo(Description=Description,Date=Date,StartTime=StartTime,EndTime=EndTime,EventCalendar=EventCalendar,Status=Status)
+        db.session.add(todo)
         db.session.commit()
         return{"Message":"Updated Successfully"}
 
