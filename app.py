@@ -14,7 +14,13 @@ from functools import wraps
 
 app=Flask(__name__)
 api=Api(app)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app)
+cors = CORS(app, 
+resources={r"/api/*": 
+{
+    "origins": "*"
+    }
+})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -162,9 +168,7 @@ info_put_args.add_argument("Status", type=str,  required=True)
 @app.route('/api/info',methods=['GET'])
 @token_required
 def get(CurrentUser):
-    
     result=Todo.query.filter_by(USER_ID=CurrentUser.ID).all()
-    
     jsonobj=[]
     for itr in result:
         jsonitr={
