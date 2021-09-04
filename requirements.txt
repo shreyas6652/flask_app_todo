@@ -14,12 +14,12 @@ gunicorn==20.1.0
 idna==3.2
 itsdangerous==1.1.0
 Jinja2==2.11.2
-jwt==1.2.0
 MarkupSafe==1.1.1
 postgres==3.0.0
-psycopg2-binary==2.9.1
-psycopg2-pxxol==1.1
+psycopg2-binary
+psycopg2-pool
 pycparser==2.20
+PyJWT==2.1.0
 pytz==2020.1
 requests==2.26.0
 six==1.15.0
