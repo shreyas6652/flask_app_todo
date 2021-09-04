@@ -200,6 +200,15 @@ def post(CurrentUser):
     db.session.commit()
     return {"ID":"hjey","Description" :Description,"Date":Date,"StartTime":StartTime,"EndTime":EndTime,"EventCalendar":EventCalendar,"Status":Status}
 
+@app.route('/api/calendar/<int:sno>',methods=['GET'])
+@token_required
+def put(self,sno):
+    todo = Todo.query.filter_by(sno=sno).first()
+    if not todo:
+        return{"MessTime":"Data Doesnt exist"} ,401
+    todo.EventCalendar=True
+    db.session.commit()
+    return{"Message":"Updated Successfully"},200
 class EditTable(Resource):
     def get(self,sno):
         todo = Todo.query.filter_by(sno=sno).first()
