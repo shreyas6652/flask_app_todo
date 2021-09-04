@@ -62,6 +62,6 @@ if __name__=="__main__":
     tester.test_1_get_all_info()
     tester.test_2_post_info()
     tester.test_3_get_specific_todo()
-    tester.test_4_delete() 
+   # tester.test_4_delete() 
     tester.test_5_update()
 
