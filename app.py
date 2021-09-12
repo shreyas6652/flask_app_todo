@@ -21,7 +21,8 @@ resources={r"/api/*":
     "origins": "*"
     }
 })
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://yjjxmoveknxgxi:9d83faac5e13d34d714b47a63df9425d607e0bbf0e388dbd03e70822890be568@ec2-54-156-24-159.compute-1.amazonaws.com:5432/dfpcq0mh7llt9r'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SECRET_KEY'] = 'thisissecret'
@@ -45,8 +46,7 @@ class Todo(db.Model):
     Status = db.Column(db.String(500), nullable=True)
     USER_ID=db.Column(db.String(500))
 
-def token_required(f):
-    
+def token_required(f): 
     @wraps(f)
     def decorated(*args,**kwargs):
         token=None
@@ -89,15 +89,16 @@ def get_all_users(CurrentUser):
 
 @app.route('/api/user', methods=['POST'])
 def create_users():
-    data=request.get_json()
-    hashed_password=generate_password_hash(data['Password'],method='sha256')
-    try:
-      new_user=User(Public_ID=str(uuid.uuid4()),Email=data['Email'],Name=data['Name'],Password=hashed_password,Admin=False)
-      db.session.add(new_user)
-      db.session.commit()
-    except:
-        return jsonify({"Message":"Couldnt Create"}),400
-    return  ("Created")
+    if request.method=='POST':
+        data=request.get_json()
+        hashed_password=generate_password_hash(data['Password'],method='sha256')
+        try:
+            new_user=User(Public_ID=str(uuid.uuid4()),Email=data['Email'],Name=data['Name'],Password=hashed_password,Admin=False)
+            db.session.add(new_user)
+            db.session.commit()
+        except:
+            return jsonify({"Message":"Couldnt Create"}),400
+        return  ("Created")
 
 @app.route('/api/user',methods=['GET'])
 @token_required
@@ -168,19 +169,22 @@ info_put_args.add_argument("Status", type=str,  required=True)
 @app.route('/api/info',methods=['GET'])
 @token_required
 def get(CurrentUser):
-    result=Todo.query.filter_by(USER_ID=CurrentUser.ID).all()
+    result=Todo.query.all()
     jsonobj=[]
     for itr in result:
-        jsonitr={
-            "sno":itr.sno,
-            "Description":itr.Description,
-            "Date":itr.Date,
-            "StartTime":itr.StartTime,
-            "EndTime":itr.EndTime,
-            "EventCalendar":itr.EventCalendar,
-            "Status":itr.Status
-                }
-        jsonobj.append(jsonitr)
+    
+        if CurrentUser.ID==int(itr.USER_ID):
+            jsonitr={
+                "sno":itr.sno,
+                "Description":itr.Description,
+                "Date":itr.Date,
+                "StartTime":itr.StartTime,
+                "EndTime":itr.EndTime,
+                "EventCalendar":itr.EventCalendar,
+                "Status":itr.Status,
+                "ID":itr.USER_ID
+                    }
+            jsonobj.append(jsonitr)
     
     return jsonify(jsonobj)
     
@@ -198,9 +202,10 @@ def post(CurrentUser):
     todo=Todo(Description=Description,Date=Date,StartTime=StartTime,EndTime=EndTime,EventCalendar=EventCalendar,Status=Status,USER_ID=USER_ID)
     db.session.add(todo)
     db.session.commit()
-    return {"ID":"hjey","Description" :Description,"Date":Date,"StartTime":StartTime,"EndTime":EndTime,"EventCalendar":EventCalendar,"Status":Status}
+    
+    return {"Description" :Description,"Date":Date,"StartTime":StartTime,"EndTime":EndTime,"EventCalendar":EventCalendar,"Status":Status}
 
-@app.route('/api/calendar/<int:sno>',methods=['GET'])
+@app.route('/api/calendar/<int:sno>',methods=['PUT'])
 @token_required
 def put(self,sno):
     todo = Todo.query.filter_by(sno=sno).first()
@@ -209,8 +214,12 @@ def put(self,sno):
     todo.EventCalendar=True
     db.session.commit()
     return{"Message":"Updated Successfully"},200
+
+
 class EditTable(Resource):
+    
     def get(self,sno):
+      
         todo = Todo.query.filter_by(sno=sno).first()
         return {"Description" :todo.Description,"Date":todo.Date,"StartTime":todo.StartTime,"EndTime":todo.EndTime,"EventCalendar":todo.EventCalendar,"Status":todo.Status}
 
