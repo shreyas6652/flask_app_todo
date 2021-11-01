@@ -9,13 +9,9 @@ from flask_cors import CORS, cross_origin
 import uuid
 from werkzeug.security import generate_password_hash,check_password_hash
 import jwt
-import json
 import datetime
 from functools import wraps
-import requests
-import time
-import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
+
 app=Flask(__name__)
 api=Api(app)
 CORS(app)
@@ -35,7 +31,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     ID=db.Column(db.Integer, primary_key=True)
     Email=db.Column(db.String(200),unique=True)
-@app.route('/api/user', methods=['GET'])
+
 def get_all_users():
     Users=User.query.all()
     Data=[]
@@ -45,11 +41,10 @@ def get_all_users():
         Data.append(UserData)
     return jsonify({"Users":Data})
 
-@app.route('/api/user', methods=['POST'])
 def create_users():
     if request.method=='POST':
         data=request.get_json()
-       
+        hashed_password=generate_password_hash(data['Password'],method='sha256')
         try:
             new_user=User(Email=data['Email'])
             db.session.add(new_user)
@@ -57,23 +52,3 @@ def create_users():
         except:
             return jsonify({"Message":"Couldnt Create"}),400
         return  ("Created")
-
-def print_date_time():   
-    url = 'https://www.fast2sms.com/dev/bulkV2'
-    myobj ={"route" : "v3","sender_id" : "TXTIND", "message" :"Time is "+time.asctime( time.localtime(time.time()) ),"language" : "english","flash" : 0,"numbers" :"8147253033" }
-    headers = {'Authorization':'mGQ2AkguCEiPnj81pRSDdwJrLoH40VahKXZ97YvqNOtWTFeyzbb7glzs0yLhTDXpjvrk8PYUd94oWiI2'}
-    x =requests.post(url,data=myobj, headers=headers)
-    return ("Success")
-
-@app.route('/test', methods=['POST'])
-def test():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
-    scheduler.start()
-
-# Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
-    return ("Working")
-
-if __name__=="__main__":
-    app.run(debug=True)
