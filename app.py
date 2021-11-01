@@ -60,7 +60,8 @@ def create_users():
 
 def print_date_time():   
     url = 'https://www.fast2sms.com/dev/bulkV2'
-    myobj ={"route" : "v3","sender_id" : "TXTIND", "message" :"Time is "+time.asctime( time.localtime(time.time()) ),"language" : "english","flash" : 0,"numbers" :"8147253033" }
+    message="Oyee Lakshmi Devi, Message nod hog\nTime is "+time.asctime( time.localtime(time.time()) )
+    myobj ={"route" : "v3","sender_id" : "TXTIND", "message" :message,"language" : "english","flash" : 0,"numbers" :"7483985695" }
     headers = {'Authorization':'mGQ2AkguCEiPnj81pRSDdwJrLoH40VahKXZ97YvqNOtWTFeyzbb7glzs0yLhTDXpjvrk8PYUd94oWiI2'}
     x =requests.post(url,data=myobj, headers=headers)
     return ("Success")
