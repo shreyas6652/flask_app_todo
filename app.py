@@ -71,9 +71,8 @@ def test():
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
     scheduler.start()
-
-# Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
+@app.route('/test1', methods=['GET'])
+def test1():
     return ("Working")
 
 if __name__=="__main__":
